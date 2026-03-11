@@ -1,0 +1,37 @@
+# Coding Nova X — Requirements
+# Install: pip install -r requirements.txt
+
+# ── Core ML Framework ─────────────────────────────────────────────────────────
+torch>=2.1.0              # PyTorch - core deep learning
+torchvision>=0.16.0       # (optional, for image tasks)
+
+# ── Tokenization ─────────────────────────────────────────────────────────────
+sentencepiece>=0.1.99     # BPE tokenizer (required)
+tokenizers>=0.15.0        # HuggingFace tokenizers (optional)
+
+# ── Data Processing ──────────────────────────────────────────────────────────
+numpy>=1.24.0             # Numerical arrays
+datasets>=2.14.0          # HuggingFace datasets (for large datasets)
+tqdm>=4.65.0              # Progress bars
+
+# ── Optimization ─────────────────────────────────────────────────────────────
+# Optional - for faster training:
+# flash-attn>=2.4.0       # Flash Attention 2 (requires CUDA)
+# bitsandbytes>=0.41.0    # INT8/INT4 quantization
+# optimum>=1.14.0         # Model optimization
+
+# ── ONNX Export ──────────────────────────────────────────────────────────────
+onnx>=1.14.0              # ONNX format
+onnxruntime>=1.16.0       # ONNX Runtime inference
+
+# ── Logging & Visualization ───────────────────────────────────────────────────
+tensorboard>=2.14.0       # Training visualization
+matplotlib>=3.7.0         # Plotting
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+psutil>=5.9.0             # System memory monitoring
+rich>=13.0.0              # Beautiful console output (optional)
+
+# ── For HuggingFace dataset downloads (optional) ──────────────────────────────
+# huggingface_hub>=0.17.0
+# transformers>=4.35.0    # For loading pretrained tokenizers

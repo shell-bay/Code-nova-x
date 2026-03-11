@@ -1,0 +1,52 @@
+{
+  "title": "Coding Nova X \u2014 Android Deployment Guide",
+  "recommended_approach": "llama.cpp JNI",
+  "model_size_estimates": {
+    "300M_FP16": "~600 MB",
+    "300M_INT8": "~300 MB",
+    "300M_INT4": "~150 MB",
+    "700M_INT4": "~350 MB"
+  },
+  "min_device_requirements": {
+    "ram": "4 GB minimum, 6 GB recommended",
+    "storage": "500 MB for INT4 model",
+    "android_version": "Android 8.0+ (API 26)",
+    "cpu": "Any ARM64 processor",
+    "gpu": "Optional \u2014 Mali/Adreno for acceleration"
+  },
+  "deployment_steps": {
+    "option_a_llamacpp": [
+      "1. Quantize model to GGUF Q4_K_M format",
+      "2. Clone llama.cpp: git clone https://github.com/ggerganov/llama.cpp",
+      "3. Build Android JNI: cd llama.cpp && ./build-android.sh",
+      "4. Add llama.cpp as Android library in build.gradle",
+      "5. Copy .gguf model file to assets/",
+      "6. Use LlamaAndroid class for inference",
+      "7. Build APK with model bundled or downloadable"
+    ],
+    "option_b_onnx": [
+      "1. Export model to ONNX format",
+      "2. Quantize ONNX model with onnxruntime tools",
+      "3. Add ONNX Runtime Mobile to build.gradle",
+      "4. Load model in OrtSession",
+      "5. Run inference with float arrays",
+      "6. Decode output IDs with tokenizer"
+    ]
+  },
+  "gradle_dependencies": "\n// Add to app/build.gradle\ndependencies {\n    // ONNX Runtime Mobile\n    implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.16.3'\n    \n    // OR for llama.cpp JNI bridge\n    // implementation project(':llama')\n}\n",
+  "kotlin_sample_code": "\n// ONNX Runtime inference on Android\nclass CodingNovaXAndroid(private val context: Context) {\n    \n    private lateinit var session: OrtSession\n    private lateinit var tokenizer: SimpleTokenizer\n    \n    fun initialize() {\n        val env = OrtEnvironment.getEnvironment()\n        val bytes = context.assets.open(\"nova_model.onnx\").readBytes()\n        session = env.createSession(bytes, OrtSession.SessionOptions())\n        tokenizer = SimpleTokenizer.load(context)\n    }\n    \n    fun generateCode(instruction: String, maxTokens: Int = 256): String {\n        val inputIds = tokenizer.encode(instruction)\n        val tensor = OnnxTensor.createTensor(env, arrayOf(inputIds))\n        \n        val result = session.run(mapOf(\"input_ids\" to tensor))\n        val logits = result[\"logits\"].get().value as Array<Array<FloatArray>>\n        \n        val generatedIds = greedyDecode(logits, maxTokens)\n        return tokenizer.decode(generatedIds)\n    }\n    \n    private fun greedyDecode(logits: Array<Array<FloatArray>>, maxTokens: Int): IntArray {\n        // Simple greedy decoding - pick highest probability token\n        return logits.last().last().let { lastLogits ->\n            intArrayOf(lastLogits.indices.maxByOrNull { lastLogits[it] } ?: 0)\n        }\n    }\n}\n",
+  "memory_optimization_tips": [
+    "Use INT4 quantization (GGUF Q4_K_M) for smallest size",
+    "Stream model weights from disk (mmap) instead of loading all to RAM",
+    "Use smaller context window (512-1024) for mobile",
+    "Limit batch size to 1 on mobile",
+    "Use memory mapping (mmap) for model files",
+    "Implement response streaming so users see output immediately"
+  ],
+  "performance_benchmarks": {
+    "note": "Approximate, varies by device",
+    "Pixel 8 (INT4)": "5-15 tokens/second",
+    "Samsung S24 (INT4)": "8-20 tokens/second",
+    "Mid-range Android (INT8)": "2-8 tokens/second"
+  }
+}
