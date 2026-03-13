@@ -162,27 +162,6 @@ solver = SelfImprovingCoder(engine, max_attempts=5)
 session = solver.solve("Write a quicksort implementation")
 print(session.final_code)  # Working, tested code
 ```
-
----
-
-## Lumina Language Support
-
-Coding Nova X includes special support for Lumina (your custom language):
-- `<|lumina|>` special token in vocabulary
-- Tokenizer trained to handle Lumina syntax
-- Instruction pairs can include Lumina code examples
-
-To add Lumina training data:
-```python
-lumina_pairs = [
-    {
-        "instruction": "Write a hello world in Lumina",
-        "response": "lumina_code_here",
-        "language": "lumina"
-    }
-]
-```
-
 ---
 
 ## License
